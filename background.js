@@ -1,6 +1,12 @@
 
 chrome.storage.local.set({ timeSaver: {} });
 
+chrome.alarms.get('timesaver', (alarm) => {
+    if (alarm) {
+        chrome.alarms.clear('timesaver');
+    }
+});
+
 async function getCurrentTab() {
     let queryOptions = { active: true, currentWindow: true };
     let [tab] = await chrome.tabs.query(queryOptions);
@@ -23,8 +29,83 @@ function killTab(tabId) {
     chrome.tabs.remove(tabId);
 }
 
+function initAlarm() {
+    chrome.alarms.create('timesaver', {
+        delayInMinutes: 0,
+        periodInMinutes: 1 // 1 minutes | set 0: 1 second
+    });
+
+    chrome.alarms.onAlarm.addListener(async () => {
+        const { timeSaver } = await getAllStorageLocalData();
+        console.log(timeSaver);
+
+        for (const key in timeSaver) {
+            if (Object.hasOwnProperty.call(timeSaver, key)) {
+                const element = timeSaver[key];
+                
+                element.duration -= 1;
+                if (element.duration === 0) {
+                    delete timeSaver[key];
+                }
+            }
+        }
+
+        chrome.storage.local.set({ timeSaver });
+    });
+}
+
+async function getAlarm(name) {
+    return new Promise((resolve, reject) => {
+        try {
+            chrome.alarms.get(name, (alarm) => {
+                resolve(alarm);
+            });
+        }
+        catch (ex) {
+            reject(ex);
+        }
+    })
+}
+
+async function killAlarm(name) {
+    return new Promise ((resolve, reject) => {
+        try {
+            chrome.alarms.clear(name, result => {
+                resolve(result);
+            });
+        }
+        catch (ex) {
+            reject(ex);
+        }
+    });
+}
+
 chrome.runtime.onInstalled.addListener(() => {
     console.log('Extension is %crunning', `color: ${'#00FF00'}`);
+
+    chrome.storage.onChanged.addListener(async (changes, areaName) => {
+        try {
+            const { timeSaver } = await getAllStorageLocalData();
+            console.log(timeSaver);
+
+            const alarm = await getAlarm('timesaver');
+
+            if (alarm) {
+                if (Object.keys(timeSaver).length === 0) {
+                    const result = await killAlarm('timesaver');
+                    if (result) console.log('Kill alarm');
+                    else console.log('Error when killing alarm');
+                }
+            }
+            else {
+                if (Object.keys(timeSaver).length > 0) {
+                    console.log('Init new alarm');
+                    initAlarm();
+                }
+            }
+
+        } catch (ex) { console.log(ex); }
+    });
 
     chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         try {
@@ -36,7 +117,7 @@ chrome.runtime.onInstalled.addListener(() => {
             for (const key in timeSaver) {
                 if (Object.hasOwnProperty.call(timeSaver, key)) {
                     const element = timeSaver[key];
-                    
+
                     if (element.link.includes(url)) {
                         console.log('Match ' + url);
                         killTab(tabId);
@@ -46,6 +127,6 @@ chrome.runtime.onInstalled.addListener(() => {
                 }
             }
 
-        } catch(ex) { console.log(ex) }
+        } catch (ex) { console.log(ex) }
     })
 });
