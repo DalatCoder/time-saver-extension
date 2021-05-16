@@ -1,0 +1,25 @@
+{
+  "name": "dalathub_meet_ui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "postcss src/tailwind.css -o public/css/styles.css",
+    "watch": "postcss src/tailwind.css -o public/css/styles.css --watch",
+    "dev": "live-server public"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fullhuman/postcss-purgecss": "^4.0.3",
+    "autoprefixer": "^10.2.5",
+    "postcss": "^8.2.14",
+    "postcss-cli": "^8.3.1",
+    "tailwindcss": "^2.1.2"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.1",
+    "tailwindcss-debug-screens": "^2.0.0"
+  }
+}
