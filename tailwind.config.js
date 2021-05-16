@@ -1,7 +1,7 @@
 module.exports = {
   purge: {
-    enabled: false,
-    content: ['./public/**/*.html']
+    enabled: true,
+    content: ['./public/**/*.html', '*.html']
   },
   theme: {
     debugScreens: {
