@@ -4,6 +4,8 @@ const btnAdd = document.getElementById('btn-add');
 const btnReset = document.getElementById('btn-reset');
 const dashboardList = document.getElementById("dashboard-list");
 
+const cbxShowHistoryPanel = document.getElementById('cbx-show-history');
+
 loadStorage();
 
 btnAdd.addEventListener('click', () => {
@@ -75,3 +77,12 @@ function renderDashboardList(timeSaverObject) {
     });
     dashboardList.innerHTML = innerHTMLs.join('');
 }
+
+cbxShowHistoryPanel.addEventListener('input', () => {
+    if (cbxShowHistoryPanel.checked) {
+        document.getElementById('history-box').classList.remove('hidden');
+    }
+    else {
+        document.getElementById('history-box').classList.add('hidden');
+    }
+});
