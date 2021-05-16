@@ -105,7 +105,7 @@ function killTab(tabId) {
 function initAlarm() {
     chrome.alarms.create('timesaver', {
         delayInMinutes: 0,
-        periodInMinutes: 0 // 1 minutes | set 0: 1 second
+        periodInMinutes: 1 // 1 minutes | set 0: 1 second
     });
 }
 
